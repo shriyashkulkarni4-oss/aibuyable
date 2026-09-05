@@ -1,4 +1,4 @@
-# AIBuyable (formerly AgenticPay)
+# AIBuyable
 
 AIBuyable is an **Agentic Commerce Control Center**. It transforms traditional e-commerce stores into "AI-Buyable" merchants. By exposing a unified catalog, guardrails, and checkout API, AIBuyable allows external AI agents (like ChatGPT, Claude, or custom shopping bots) to seamlessly negotiate and purchase products on behalf of users, while keeping merchants strictly in control via an autonomous Human-in-the-Loop (HITL) system.
 
