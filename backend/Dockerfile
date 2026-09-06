@@ -1,4 +1,5 @@
-FROM python:3.12-slim
+# Use the official Microsoft Playwright image which comes pre-installed with all Chromium OS dependencies
+FROM mcr.microsoft.com/playwright/python:v1.45.1-jammy
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -9,12 +10,11 @@ WORKDIR /app
 # Copy and install our exact dependencies 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN playwright install --with-deps chromium
 
 # Copy the rest of the application
 COPY . .
 
-# Expose port (Render sets PORT env automatically, we'll use a shell script trick or just 10000)
+# Expose port
 EXPOSE 10000
 
 # Start Uvicorn
