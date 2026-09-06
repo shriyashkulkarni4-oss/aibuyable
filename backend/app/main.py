@@ -70,7 +70,12 @@ app = FastAPI(
 # CORS — allow the React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL, "http://localhost:5173", "http://localhost:3000"],
+    allow_origins=[
+        settings.FRONTEND_URL, 
+        "http://localhost:5173", 
+        "http://localhost:3000",
+        "https://aibuyable-inky.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
