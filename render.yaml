@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: aibuyable-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://neondb_owner:npg_cwK9VGds4JHu@ep-floral-dream-b3gnh6m1-pooler.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: GOOGLE_API_KEY
+        sync: false # You must set this manually in the Render Dashboard
+      - key: FRONTEND_URL
+        sync: false # Set this to your Vercel URL once you have it
