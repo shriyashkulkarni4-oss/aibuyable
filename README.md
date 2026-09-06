@@ -1,37 +1,51 @@
-# AIBuyable
+<div align="center">
+  <h1>🛍️ AIBuyable</h1>
+  <h3>Agentic Commerce Control Center</h3>
+  <p><i>Transform traditional e-commerce stores into autonomous, "AI-Buyable" merchants.</i></p>
 
-AIBuyable is an **Agentic Commerce Control Center**. It transforms traditional e-commerce stores into "AI-Buyable" merchants. By exposing a unified catalog, guardrails, and checkout API, AIBuyable allows external AI agents (like ChatGPT, Claude, or custom shopping bots) to seamlessly negotiate and purchase products on behalf of users, while keeping merchants strictly in control via an autonomous Human-in-the-Loop (HITL) system.
+  <a href="https://aibuyable-inky.vercel.app"><b>🌐 View Live Demo</b></a> • 
+  <a href="#-architecture--langgraph-pipeline"><b>Read Architecture</b></a> •
+  <a href="#-external-ai-manifest"><b>API Docs</b></a>
+  
+  <br/><br/>
+  
+  ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+  ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+  ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+  ![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
+  ![Razorpay](https://img.shields.io/badge/Razorpay-02042B?style=for-the-badge&logo=razorpay&logoColor=3395FF)
+
+</div>
+
+---
+
+## ⚡ The Problem
+
+As AI agents (like ChatGPT, Claude, and custom shopping bots) become more advanced, users will increasingly delegate their shopping tasks to AI. However, traditional e-commerce stores are built for *human* eyes (HTML, CSS), not for autonomous agents. 
+
+If an AI tries to negotiate a discount or buy a product for a user today, there is no standard protocol, no safety boundary for the merchant, and no native API for the AI to seamlessly execute the transaction.
+
+## 🎯 The Solution: AIBuyable
+
+**AIBuyable** bridges the gap between traditional merchants and autonomous AI buyers. 
+
+By wrapping a merchant's inventory in a rigorous **LangGraph-powered checkout pipeline**, AIBuyable exposes a unified catalog, strict mathematical guardrails, and a secure checkout API. It allows external AI agents to seamlessly negotiate and purchase products on behalf of users, while keeping merchants strictly in control via an autonomous **Human-in-the-Loop (HITL)** system.
+
+---
 
 ## 🚀 Key Features
 
-- **Agentic Checkout Pipeline**: Powered by LangGraph, transactions are autonomously evaluated against merchant-defined guardrails.
-- **Human-in-the-Loop (HITL) Inbox**: If an AI agent requests a discount that exceeds the merchant's guardrails, the order is intercepted and sent to a real-time HITL inbox for manual merchant approval.
-- **External AI Manifests**: Exposes a `/.well-known/agentic-commerce.json` discovery manifest so third-party LLMs know exactly how to interact with the store.
-- **Automated Catalog Crawling**: Built-in deep scraper that can crawl a merchant's existing website and automatically populate the product catalog.
-- **Razorpay Integration**: Seamlessly generates and validates Razorpay payment links upon successful guardrail clearance.
-
-## 🛒 Merchant Onboarding & Catalog Flow
-
-AIBuyable makes it incredibly easy for traditional merchants to digitize their inventory and prepare for AI buyers:
-
-1. **Sign Up & Keys**: The merchant creates an account and securely enters their Razorpay API keys (which are encrypted at rest using military-grade Fernet encryption).
-2. **Deep Website Crawling**: Instead of manually entering products, the merchant can enter their existing website URL (e.g., `https://their-store.com`). AIBuyable's built-in deep scraper automatically crawls the site, extracts product names, prices, and images, and populates the PostgreSQL database.
-3. **Setting Guardrails**: The merchant configures their risk tolerance (e.g., "Allow up to 15% discount automatically, but intercept anything over $1000 for manual review").
-4. **Go Live**: The merchant's catalog is instantly accessible via the external AI API and the inbuilt chat widget!
+* 🤖 **Agentic Checkout Pipeline:** Powered by LangGraph, every single transaction—whether from a human or an external AI bot—is autonomously evaluated against the merchant's financial guardrails.
+* 🛑 **Human-in-the-Loop (HITL) Inbox:** If an AI agent requests a discount that exceeds the merchant's predefined guardrails, the order is intercepted. It enters a real-time HITL inbox for manual merchant approval or rejection.
+* 🌐 **External AI Manifests:** Exposes a `/.well-known/agentic-commerce.json` discovery manifest. Third-party LLMs can instantly read this to know exactly how to negotiate and checkout from the store.
+* 🕷️ **Automated Deep Crawling:** Merchants don't need to manually enter products. A built-in web scraper crawls their existing website, extracts product data (prices, images, descriptions), and populates the database instantly.
+* 💳 **Razorpay Integration:** Secure, instant generation of Razorpay payment links upon successful guardrail clearance.
 
 ---
 
-## 🛠️ Technology Stack
+## 🧠 Architecture & LangGraph Pipeline
 
-- **Backend**: Python, FastAPI, SQLAlchemy, PostgreSQL, LangGraph, Google Gemini (LLM), Razorpay API.
-- **Frontend**: React (Vite), TypeScript, CSS Variables (Custom Design System).
-- **Security**: JWT Authentication, Fernet military-grade encryption for API keys.
-
----
-
-## 🧠 LangGraph Agent Architecture
-
-The core of AIBuyable is a stateful, directed acyclic graph (DAG) built with **LangGraph**. Whether a purchase request comes from the inbuilt AI Buyer chat widget or an external LLM via the API, it flows through the exact same rigorous pipeline.
+The core of AIBuyable is a stateful, directed acyclic graph (DAG) built with **LangGraph**. LLM usage is strictly limited to intent parsing—all money math and guardrail decisions are executed in pure, deterministic Python.
 
 ```mermaid
 graph TD
@@ -57,50 +71,60 @@ graph TD
     Webhook --> Stock[Reduce Stock & Notify Chat]
 ```
 
-### The Graph Nodes:
+---
 
-1. **`parse_intent`**
-   - *Input:* User's raw text message (e.g., "I want a keyboard with 20% off").
-   - *Action:* The LLM extracts the exact items, quantities, and requested discount percentages.
-2. **`get_catalog`**
-   - *Action:* Queries the PostgreSQL database to fetch the merchant's active, in-stock products.
-3. **`select_and_price`**
-   - *Action:* Cross-references the parsed intent with the actual catalog. Verifies stock availability and calculates the total mathematical amount.
-4. **`check_discount_eligibility`**
-   - *Action:* Validates the mathematical reality of the requested discount against the subtotal.
-5. **`guardrail_check` (The Shield)**
-   - *Action:* Fetches the merchant's configured `Guardrails` (e.g., max discount 15%, max auto-approve amount $1,000).
-   - *Decision Point:* 
-     - If the request is safe: Routes to `auto_approve`.
-     - If the request breaks limits: Routes to `hitl_required`.
-6. **`create_razorpay_order`**
-   - *Action:* Connects to the Razorpay API to generate a real payment link.
-7. **`escalate_to_hitl`**
-   - *Action:* Pauses the graph. Creates a pending order in the merchant's HITL Inbox. The frontend chat begins polling. Once the merchant manually clicks "Approve", the graph resumes and triggers `create_razorpay_order`.
+## 🔌 External AI Manifest
+
+AIBuyable turns the store into a headless API for other LLMs. External bots can interact with the following endpoints:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/.well-known/agentic-commerce.json` | `GET` | Discovery manifest detailing how an AI can buy from this store. |
+| `/api/v1/agentic/catalog` | `GET` | Token-lean, LLM-optimized product catalog. |
+| `/api/v1/agentic/guardrails` | `GET` | Upfront disclosure of the merchant's discount limits. |
+| `/api/v1/agentic/checkout` | `POST` | Injects the external bot's request directly into the LangGraph pipeline. |
 
 ---
 
-## 🔌 External AI Integrations
+## 🛠️ Technology Stack
 
-AIBuyable doesn't just provide a chat widget; it turns the store into an API for other LLMs. External bots can hit the following endpoints using the `merchant_id`:
+* **Backend & AI:** Python, FastAPI, LangGraph, LangChain, Google Gemini 2.5 Flash
+* **Database:** PostgreSQL (Neon), SQLAlchemy, Alembic
+* **Frontend:** React 19, TypeScript, Vite, Tailwind-inspired Custom CSS
+* **Payments:** Razorpay API
+* **Security:** JWT Authentication, Fernet military-grade encryption for API keys at rest
 
-- `GET /.well-known/agentic-commerce.json` - Discovery manifest.
-- `GET /api/v1/agentic/catalog` - Token-lean product catalog.
-- `GET /api/v1/agentic/guardrails` - Upfront disclosure of discount limits.
-- `POST /api/v1/agentic/checkout` - Injects the external bot's request directly into the LangGraph pipeline at the `select_and_price` node.
+---
 
-## 📦 Setup & Installation
+## 📦 Local Setup & Installation
 
-### Backend
-1. Navigate to the `backend/` directory.
-2. Create a Python virtual environment: `python -m venv venv`
-3. Activate it and install dependencies: `pip install -r requirements.txt`
-4. Copy `.env.example` to `.env` and fill in your PostgreSQL URL, Gemini API Key, and JWT Secret.
-5. Start the server: `uvicorn app.main:app --reload`
+### 1. Clone the Repository
+```bash
+git clone https://github.com/shriyashkulkarni4-oss/aibuyable.git
+cd aibuyable
+```
 
-### Frontend
-1. Navigate to the `frontend/` directory.
-2. Install dependencies: `npm install`
-3. Start the Vite dev server: `npm run dev`
-
+### 2. Backend Setup
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+```
+*Copy `.env.example` to `.env` and configure your Database URL, Gemini API Key, and JWT Secrets.*
+```bash
+uvicorn app.main:app --reload
+```
 *(Note: The database tables and the default admin account `admin@aibuyable.com` are automatically seeded upon the first successful backend startup).*
+
+### 3. Frontend Setup
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+
+---
+<div align="center">
+  <i>Built with ❤️ for the AI Commerce Revolution</i>
+</div>
